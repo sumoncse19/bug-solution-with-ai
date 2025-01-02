@@ -42,6 +42,7 @@ const geminiImageSolution = catchAsync(
               mimetype: req.file.mimetype,
             }
           : null,
+        feedbackType: req.body.feedbackType || '',
       }
 
       const result =

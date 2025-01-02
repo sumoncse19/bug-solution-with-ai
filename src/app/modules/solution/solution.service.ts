@@ -3,6 +3,8 @@ import OpenAI from 'openai'
 import config from '../../config'
 import { GoogleGenerativeAI } from '@google/generative-ai'
 import * as fs from 'fs'
+import { ITextSolution } from './solution.interface'
+import { ImageSolutionModel, TextSolutionModel } from './solution.mode'
 
 const gptSolutionService = async (queryData: { prompt: string }) => {
   try {
@@ -31,7 +33,7 @@ const gptSolutionService = async (queryData: { prompt: string }) => {
   }
 }
 
-const geminiTextSolutionService = async (queryData: { prompt: string }) => {
+const geminiTextSolutionService = async (queryData: ITextSolution) => {
   try {
     const genAI = new GoogleGenerativeAI(`${config.gemini_api_key}`)
     const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
@@ -42,6 +44,14 @@ const geminiTextSolutionService = async (queryData: { prompt: string }) => {
     if (!result.response.text()) {
       throw new Error('No response from OpenAI')
     }
+
+    const addTextSolutionInDB = new TextSolutionModel({
+      prompt: queryData.prompt,
+      feedbackType: queryData.feedbackType,
+      solution: result.response.text(),
+    })
+
+    await addTextSolutionInDB.save()
 
     return result.response.text()
   } catch (err: any) {
@@ -61,6 +71,7 @@ interface ImageQueryData {
     path?: string
     mimetype?: string
   } | null
+  feedbackType: string
 }
 
 const geminiImageSolutionService = async (queryData: ImageQueryData) => {
@@ -101,8 +112,19 @@ const geminiImageSolutionService = async (queryData: ImageQueryData) => {
       throw new Error('No text content in the Gemini response')
     }
 
+    const addImageSolutionInDB = new ImageSolutionModel({
+      prompt: queryData.prompt,
+      feedbackType: queryData.feedbackType,
+      imageFile: {
+        buffer: queryData.imageFile.buffer,
+        mimetype: queryData.imageFile.mimetype,
+      },
+      solution: text,
+    })
+
+    await addImageSolutionInDB.save()
+
     return {
-      role: 'assistant',
       content: text,
     }
   } catch (err: any) {
