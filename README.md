@@ -16,9 +16,9 @@ A modern feedback system powered by AI that helps users get instant solutions fo
 
 ## Live Preview and GitHub URL
 
-[Live Preview Frontend](https://bug-solution.vercel.app/)
-[Live Preview Backend](https://bug-solution.onrender.com/)
-[GitHub Repository Frontend](https://github.com/sumoncse19/bug-solution-client)
+[Live Preview Frontend](https://bug-solution.vercel.app/) | 
+[Live Preview Backend](https://bug-solution.onrender.com/) | 
+[GitHub Repository Frontend](https://github.com/sumoncse19/bug-solution-client) | 
 [GitHub Repository Backend](https://github.com/sumoncse19/bug-solution-with-ai)
 
 ## Prerequisites
