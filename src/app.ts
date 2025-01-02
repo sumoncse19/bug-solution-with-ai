@@ -1,5 +1,5 @@
 import cors from 'cors'
-import express, { Application, Request, Response } from 'express'
+import express, { Application, Request, Response, NextFunction } from 'express'
 import notFound from './app/middleware/notFound'
 import globalErrorHandler from './app/middleware/globalErrorHandler'
 import router from './app/routes'
@@ -27,5 +27,8 @@ app.use('/api/v1', router)
 app.use(globalErrorHandler)
 
 // Not found route
-app.use(notFound)
+app.use((req: Request, res: Response, next: NextFunction) => {
+  notFound(req, res, next)
+})
+
 export default app
