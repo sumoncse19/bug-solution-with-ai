@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export interface ITextSolution {
   prompt: string
   feedbackType: string
-  solution: string
+  solution?: string
 }
 
 export interface IImageSolution {
@@ -11,6 +12,7 @@ export interface IImageSolution {
     path?: string
     mimetype?: string
   } | null
+  originalImage: any
   feedbackType: string
-  solution: string
+  solution?: string
 }

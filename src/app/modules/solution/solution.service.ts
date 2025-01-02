@@ -3,8 +3,8 @@ import OpenAI from 'openai'
 import config from '../../config'
 import { GoogleGenerativeAI } from '@google/generative-ai'
 import * as fs from 'fs'
-import { ITextSolution } from './solution.interface'
-import { ImageSolutionModel, TextSolutionModel } from './solution.mode'
+import { IImageSolution, ITextSolution } from './solution.interface'
+import { ImageSolutionModel, TextSolutionModel } from './solution.model'
 
 const gptSolutionService = async (queryData: { prompt: string }) => {
   try {
@@ -64,17 +64,27 @@ const geminiTextSolutionService = async (queryData: ITextSolution) => {
   }
 }
 
-interface ImageQueryData {
-  prompt: string
-  imageFile: {
-    buffer?: Buffer
-    path?: string
-    mimetype?: string
-  } | null
-  feedbackType: string
+const getGeminiTextSolutionServiceFromDB = async (
+  page: number,
+  limit: number,
+) => {
+  try {
+    const skip = (page - 1) * limit
+
+    const result = await TextSolutionModel.find()
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+
+    const total = await TextSolutionModel.countDocuments({})
+
+    return { allTextSolution: result, total, page, limit }
+  } catch (err: any) {
+    throw new Error(`Gemini API Error: ${err.message}`)
+  }
 }
 
-const geminiImageSolutionService = async (queryData: ImageQueryData) => {
+const geminiImageSolutionService = async (queryData: IImageSolution) => {
   try {
     if (!queryData.imageFile) {
       throw new Error('No image file provided')
@@ -115,10 +125,7 @@ const geminiImageSolutionService = async (queryData: ImageQueryData) => {
     const addImageSolutionInDB = new ImageSolutionModel({
       prompt: queryData.prompt,
       feedbackType: queryData.feedbackType,
-      imageFile: {
-        buffer: queryData.imageFile.buffer,
-        mimetype: queryData.imageFile.mimetype,
-      },
+      imageFile: queryData.originalImage,
       solution: text,
     })
 
@@ -133,8 +140,28 @@ const geminiImageSolutionService = async (queryData: ImageQueryData) => {
   }
 }
 
+const getGeminiImageSolutionServiceFromDB = async (
+  page: number,
+  limit: number,
+) => {
+  try {
+    const skip = (page - 1) * limit
+
+    const result = await ImageSolutionModel.find()
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+
+    return result
+  } catch (err: any) {
+    throw new Error(`Gemini API Error: ${err.message}`)
+  }
+}
+
 export const SolutionServices = {
   gptSolutionService,
   geminiTextSolutionService,
+  getGeminiTextSolutionServiceFromDB,
   geminiImageSolutionService,
+  getGeminiImageSolutionServiceFromDB,
 }

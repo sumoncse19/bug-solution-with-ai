@@ -19,6 +19,7 @@ const imageSolutionSchema = new Schema<IImageSolution>(
       mimetype: { type: String },
     },
     feedbackType: { type: String, required: true },
+    originalImage: { type: String },
     solution: { type: String },
   },
   { timestamps: true },

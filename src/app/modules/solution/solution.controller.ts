@@ -26,6 +26,28 @@ const geminiTextSolution = catchAsync(
   'Failed to get solution try again',
 )
 
+const getGeminiTextSolutions = catchAsync(
+  async (req: Request, res: Response) => {
+    const { page = '1', limit = '10' } = req.query
+
+    const pageNum = parseInt(page as string, 10)
+    const limitNum = parseInt(limit as string, 10)
+
+    const geminiTextSolutions =
+      await SolutionServices.getGeminiTextSolutionServiceFromDB(
+        pageNum,
+        limitNum,
+      )
+
+    return SUCCESS(
+      res,
+      httpStatus.OK,
+      'Get gemini text solutions successfully',
+      geminiTextSolutions,
+    )
+  },
+)
+
 const geminiImageSolution = catchAsync(
   async (req: Request, res: Response) => {
     const upload = multer({ storage: multer.memoryStorage() })
@@ -42,6 +64,7 @@ const geminiImageSolution = catchAsync(
               mimetype: req.file.mimetype,
             }
           : null,
+        originalImage: req.file,
         feedbackType: req.body.feedbackType || '',
       }
 
@@ -55,8 +78,32 @@ const geminiImageSolution = catchAsync(
   'Failed to get solution try again',
 )
 
+const getGeminiImageSolutions = catchAsync(
+  async (req: Request, res: Response) => {
+    const { page = '1', limit = '10' } = req.query
+
+    const pageNum = parseInt(page as string, 10)
+    const limitNum = parseInt(limit as string, 10)
+
+    const geminiImageSolutions =
+      await SolutionServices.getGeminiImageSolutionServiceFromDB(
+        pageNum,
+        limitNum,
+      )
+
+    return SUCCESS(
+      res,
+      httpStatus.OK,
+      'Get gemini image solutions successfully',
+      geminiImageSolutions,
+    )
+  },
+)
+
 export const SolutionControllers = {
   gptSolution,
   geminiTextSolution,
+  getGeminiTextSolutions,
   geminiImageSolution,
+  getGeminiImageSolutions,
 }
