@@ -152,7 +152,9 @@ const getGeminiImageSolutionServiceFromDB = async (
       .skip(skip)
       .limit(limit)
 
-    return result
+    const total = await ImageSolutionModel.countDocuments({})
+
+    return { allImageSolution: result, total, page, limit }
   } catch (err: any) {
     throw new Error(`Gemini API Error: ${err.message}`)
   }
